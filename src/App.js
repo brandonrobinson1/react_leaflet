@@ -7,19 +7,22 @@ import {
   Popup,
   useMapEvents,
 } from "react-leaflet";
-
+import * as subwayData from "./data/subwayData.json";
 import "leaflet/dist/leaflet.css";
 
 function App() {
-  const [subways, setSubways] = useState([{}]);
-
+  const [subways, setSubways] = useState([]);
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
+    setLoading(true);
     const getData = async () => {
       const res = await fetch("https://data.ny.gov/resource/i9wp-a4ja.json");
       const stations = await res.json();
       setSubways(stations);
     };
+
     getData();
+    setLoading(false);
   }, []);
 
   const customIcon = new Icon({
@@ -28,20 +31,6 @@ function App() {
     iconSize: [38, 38], // size of the icon
   });
 
-  const getMarkers = () => {
-    subways.map((station) => {
-      console.log(station);
-      return (
-        <Marker
-          position={[station.latitude, station.longitude]}
-          icon={customIcon}
-        >
-          <Popup>Subway</Popup>
-        </Marker>
-      );
-    });
-  };
-
   return (
     <MapContainer center={[40.730761, -73.935242]} zoom={13}>
       <TileLayer
@@ -49,14 +38,19 @@ function App() {
         url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png
       "
       />
-      <Marker
-        title="sample"
-        icon={customIcon}
-        position={[-73.754178, 40.604657]}
-      >
-        Hello!
-      </Marker>
-      {getMarkers()}
+
+      {!loading &&
+        subways.map((station) => {
+          console.log(station);
+          return (
+            <Marker
+              position={[station.station_latitude, station.station_longitude]}
+              icon={customIcon}
+            >
+              <Popup>{station.name}</Popup>
+            </Marker>
+          );
+        })}
     </MapContainer>
   );
 }
