@@ -1,5 +1,5 @@
 import { Icon } from "leaflet";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   MapContainer,
   TileLayer,
@@ -11,29 +11,36 @@ import {
 import "leaflet/dist/leaflet.css";
 
 function App() {
-  function LocationMarker() {
-    const [position, setPosition] = useState(null);
-    const map = useMapEvents({
-      click() {
-        map.locate();
-      },
-      locationfound(e) {
-        setPosition(e.latlng);
-        map.flyTo(e.latlng, map.getZoom());
-      },
-    });
+  const [subways, setSubways] = useState([{}]);
 
-    return position === null ? null : (
-      <Marker icon={customIcon} position={position}>
-        <Popup>You are here</Popup>
-      </Marker>
-    );
-  }
+  useEffect(() => {
+    const getData = async () => {
+      const res = await fetch("https://data.ny.gov/resource/i9wp-a4ja.json");
+      const stations = await res.json();
+      setSubways(stations);
+    };
+    getData();
+  }, []);
+
   const customIcon = new Icon({
     iconUrl: "https://cdn-icons-png.flaticon.com/512/447/447031.png",
     // iconUrl: require("./icons/Map_pin_icon"),
     iconSize: [38, 38], // size of the icon
   });
+
+  const getMarkers = () => {
+    subways.map((station) => {
+      console.log(station);
+      return (
+        <Marker
+          position={[station.latitude, station.longitude]}
+          icon={customIcon}
+        >
+          <Popup>Subway</Popup>
+        </Marker>
+      );
+    });
+  };
 
   return (
     <MapContainer center={[40.730761, -73.935242]} zoom={13}>
@@ -42,18 +49,16 @@ function App() {
         url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png
       "
       />
-      <LocationMarker />
+      <Marker
+        title="sample"
+        icon={customIcon}
+        position={[-73.754178, 40.604657]}
+      >
+        Hello!
+      </Marker>
+      {getMarkers()}
     </MapContainer>
   );
 }
 
 export default App;
-//  <Marker
-//         position={[40.78617, -73.94197]}
-//         icon={customIcon}
-//         draggable={true}
-//       >
-//         <Popup>
-//           A pretty CSS3 popup. <br /> Easily customizable.
-//         </Popup>
-//       </Marker>
