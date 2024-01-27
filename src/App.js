@@ -9,6 +9,7 @@ import {
 } from "react-leaflet";
 import * as subwayData from "./data/subwayData.json";
 import "leaflet/dist/leaflet.css";
+import MarkerClusterGroup from "react-leaflet-cluster";
 
 function App() {
   const [subways, setSubways] = useState([]);
@@ -38,19 +39,22 @@ function App() {
         url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png
       "
       />
-
-      {!loading &&
-        subways.map((station) => {
-          console.log(station);
-          return (
-            <Marker
-              position={[station.station_latitude, station.station_longitude]}
-              icon={customIcon}
-            >
-              <Popup>{station.name}</Popup>
-            </Marker>
-          );
-        })}
+      <MarkerClusterGroup>
+        {!loading &&
+          subways.map((station) => {
+            return (
+              <Marker
+                position={[station.station_latitude, station.station_longitude]}
+                icon={customIcon}
+              >
+                <Popup>
+                  <h1>{station.station_name}</h1>
+                  <p>Routes: {station.daytime_routes}</p>
+                </Popup>
+              </Marker>
+            );
+          })}
+      </MarkerClusterGroup>
     </MapContainer>
   );
 }
