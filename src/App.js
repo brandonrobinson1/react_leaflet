@@ -1,13 +1,6 @@
 import { Icon } from "leaflet";
 import { useState, useEffect } from "react";
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  Popup,
-  useMapEvents,
-} from "react-leaflet";
-import * as subwayData from "./data/subwayData.json";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import MarkerClusterGroup from "react-leaflet-cluster";
 
@@ -28,34 +21,42 @@ function App() {
 
   const customIcon = new Icon({
     iconUrl: "https://cdn-icons-png.flaticon.com/512/447/447031.png",
-    // iconUrl: require("./icons/Map_pin_icon"),
     iconSize: [38, 38], // size of the icon
   });
 
   return (
-    <MapContainer center={[40.730761, -73.935242]} zoom={13}>
-      <TileLayer
-        attribution='&copy; <a href="https://www.stadiamaps.com/" target="_blank">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/" target="_blank">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        url="https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png
-      "
-      />
-      <MarkerClusterGroup>
-        {!loading &&
-          subways.map((station) => {
-            return (
-              <Marker
-                position={[station.station_latitude, station.station_longitude]}
-                icon={customIcon}
-              >
-                <Popup>
-                  <h1>{station.station_name}</h1>
-                  <p>Routes: {station.daytime_routes}</p>
-                </Popup>
-              </Marker>
-            );
-          })}
-      </MarkerClusterGroup>
-    </MapContainer>
+    <div style={{ display: "15rem" }}>
+      <MapContainer center={[40.730761, -73.935242]} zoom={13}>
+        <TileLayer
+          attribution="Google Maps"
+          url="http://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}" // regular
+          //url="http://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}" // satellite
+          // url="http://{s}.google.com/vt/lyrs=p&x={x}&y={y}&z={z}" // terrain
+          maxZoom={20}
+          subdomains={["mt0", "mt1", "mt2", "mt3"]}
+        />
+
+        <MarkerClusterGroup chunkedLoading>
+          {!loading &&
+            subways.map((station) => {
+              return (
+                <Marker
+                  position={[
+                    station.station_latitude,
+                    station.station_longitude,
+                  ]}
+                  icon={customIcon}
+                >
+                  <Popup>
+                    <h2>{station.station_name}</h2>
+                    <h3>Routes: {station.daytime_routes}</h3>
+                  </Popup>
+                </Marker>
+              );
+            })}
+        </MarkerClusterGroup>
+      </MapContainer>
+    </div>
   );
 }
 
