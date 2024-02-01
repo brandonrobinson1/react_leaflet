@@ -33,7 +33,6 @@ function App() {
           maxZoom={20}
           subdomains={["mt0", "mt1", "mt2", "mt3"]}
         />
-
         <MarkerClusterGroup chunkedLoading>
           {!loading &&
             subways.map((station) => {
